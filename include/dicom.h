@@ -23,8 +23,8 @@
 #define dicom_h
 
 //DICOM Readers
-void ReadDICOMFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
-float ReadDICOMTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
-long ReadDICOMTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern void ReadDICOMFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
+extern float ReadDICOMTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern long ReadDICOMTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
 
 #endif

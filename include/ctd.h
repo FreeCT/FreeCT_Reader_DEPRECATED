@@ -23,8 +23,8 @@
 #define ctd_h
 
 //CTD Readers
-void ReadCTDFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
-float ReadCTDTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
-long ReadCTDTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern void ReadCTDFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
+extern float ReadCTDTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern long ReadCTDTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
 
 #endif

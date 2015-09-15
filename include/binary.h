@@ -22,6 +22,6 @@
 #ifndef binary_h
 #define binary_h
 
-void ReadBinaryFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f,size_t d_offset);
+extern void ReadBinaryFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f,size_t d_offset);
 
 #endif

@@ -23,8 +23,8 @@
 #define ptr_h
 
 //PTR Readers
-void ReadPTRFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
-float ReadPTRTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
-long ReadPTRTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern void ReadPTRFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
+extern float ReadPTRTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern long ReadPTRTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
 
 #endif
