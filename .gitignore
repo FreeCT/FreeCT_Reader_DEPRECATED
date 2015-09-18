@@ -8,6 +8,7 @@ test
 # Random files
 .recon_wfbp.sh
 main.c
+.main.c
 
 # Parameter files
 # Parameter file directory, except samples
