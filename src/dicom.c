@@ -44,19 +44,115 @@ struct dicom_tag read_tag_info(FILE* fp,const char * transfer_syntax);
 int check_str(char * a, const char * b);
 
 void ReadDICOMFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f){
+
     struct dicom_tag t;
+
+    char raw_DS[17]={0}; // to hold the raw decimal strings for rescale fields
+    
+    // Get the rescale intercept
+    float rescale_intercept;
+    t=dicom_scan(fp,"\x28\x00","\x52\x10");
+    fseek(fp,t.byte_offset_to_data,SEEK_SET);
+    fread(raw_DS,sizeof(char),t.size,fp);
+    rescale_intercept=atof(raw_DS);
+    memset(raw_DS,0,17*sizeof(char));
+    fseek(fp,0,SEEK_SET);
+    
+    // Get the rescale slope
+    float rescale_slope;
+    t=dicom_scan(fp,"\x28\x00","\x53\x10");
+    fseek(fp,t.byte_offset_to_data,SEEK_SET);
+    fread(raw_DS,sizeof(char),t.size,fp);
+    rescale_slope=atof(raw_DS);
+    memset(raw_DS,0,17*sizeof(char));
+    fseek(fp,0,SEEK_SET);
+
+    // Get the memory pitch (i.e. total number of projections)
+    uint16_t n_readings;
+    t=dicom_scan(fp,"\x28\x00","\x11\x00");
+    fseek(fp,t.byte_offset_to_data,SEEK_SET);
+    fread(&n_readings,1,t.size,fp);
+    fseek(fp,0,SEEK_SET);
+
+    // Grab the frame in question
+    // Data are stored as int16 (or uint16?)
+    int16_t * f_hold=(int16_t*)malloc(sizeof(int16_t)*num_channels*num_slices);
     t=dicom_scan(fp,"\xe0\x7f","\x10\x00");
-    printf("Byte offset for rawdata is: %lu\n",t.byte_offset_to_data);
+    fseek(fp,t.byte_offset_to_data,SEEK_SET);
+
+    /* Data is currently stored as: */
+    //    
+    //             proj1             proj2             proj3      ...    projNproj
+    // row1,chan1  mem_add_1         mem_add_2         mem_add_3  ...    mem_add_Nproj
+    // row1,chan2  mem_add_(Nproj+1) mem_add_(Nproj+2) mem_add_(Nproj+3) mem_add_(2*Nproj)
+    //    ...                                       ...........
+    // row1,chanM
+    // row2,chan1
+    // row2,chan2
+    //    ...
+    // row2,chanM
+    //    ...
+    // rowN,chanM 
+    //
+    // All of the projection data for one detector element is stored
+    // linearly in memory.  This is very inefficient given that we do
+    // not use projection data in this way for reconstruction.  It is
+    // more beneficial (both intuitively and computationally) to store
+    // a single frame linearly in memory, then move on to the next
+    // frame.  I'm going to lobby Mayo to see if this would be a
+    // tractable change, however we implement a reader here for the
+    // current format, despite my reservations.
+
+    // Seek to the frame we want
+    fseek(fp,sizeof(uint16_t)*frame_index,SEEK_CUR);
+    for (int i=0; i<num_channels*num_slices;i++){
+    	fread(&f_hold[i],sizeof(uint16_t),1,fp);
+    	fseek(fp,(n_readings-1)*sizeof(uint16_t),SEEK_CUR);
+    	f[i]=rescale_slope*(float)f_hold[i]+rescale_intercept;
+    }
+
+    /* If the data had be stored the way I want it to be */
+    //size_t offset=frame_index*num_channels*num_slices*sizeof(int16_t);
+    //fseek(fp,offset,SEEK_CUR);
+    //fread(f_hold,sizeof(int16_t),num_channels*num_slices,fp);
+    //for (int i=0;i<num_channels*num_slices;i++){
+    //	f[i]=rescale_slope*(float)f_hold[i]+rescale_intercept;
+    //}
+
 }
 
 float ReadDICOMTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices){
-    printf("We are in the process of adding support for the open dicom raw data format.\n");
-    return 0;
+
+    struct dicom_tag t;
+    
+    float tube_angle;
+    t=dicom_scan(fp,"\x31\x70","\x01\x10");
+    // Seek to start of data
+    fseek(fp,t.byte_offset_to_data,SEEK_SET);
+    // Seek to requested frame
+    fseek(fp,sizeof(float)*frame_index,SEEK_CUR);
+    fread(&tube_angle,sizeof(float),1,fp);
+    fseek(fp,0,SEEK_SET);
+    
+    return tube_angle;
 }
 
 long ReadDICOMTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices){
-    printf("We are in the process of adding support for the open dicom raw data format.\n");
-    return 0;
+
+    struct dicom_tag t;
+    
+    float table_position;
+    t=dicom_scan(fp,"\x31\x70","\x02\x10");
+    // Seek to start of data
+    fseek(fp,t.byte_offset_to_data,SEEK_SET);
+
+    // Seek to requested frame
+    fseek(fp,sizeof(float)*frame_index,SEEK_CUR);
+    fread(&table_position,sizeof(float),1,fp);
+    fseek(fp,0,SEEK_SET);
+
+    // Scaled to make function match format of other Siemens readers
+    return table_position*1000;
 }
 
 
@@ -180,11 +276,11 @@ struct dicom_tag dicom_scan(FILE* fp,const char * search_group,const char* searc
 	printf("DICOM transfer syntax is invalid for a raw data file.  Quitting.\n");
     }
     
-    while ((strcmp(tag.group,search_group)!=0)&&strcmp(tag.element,search_element)!=0){
+    while ((strcmp(tag.group,search_group)!=0)||strcmp(tag.element,search_element)!=0){
 	tag=read_tag_info(fp,(const char *)transfer_syntax);
-	printf("Offset for tag data: %lu\n",tag.byte_offset_to_data);
+	//printf("Offset for tag data: %lu\n",tag.byte_offset_to_data);
 	fseek(fp,tag.size,SEEK_CUR);
-	printf("\n");
+	//printf("\n");
     }
     
     return tag;    

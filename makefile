@@ -3,6 +3,7 @@ INSTALL_PATH?=/usr/
 all: rebuild
 
 rebuild:
+	mkdir -p src/obj
 	$(MAKE) -C src ../libfct_read.a
 	mkdir -p build
 	cp include/* build/
