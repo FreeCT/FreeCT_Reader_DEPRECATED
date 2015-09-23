@@ -77,7 +77,8 @@ void ReadDICOMFrame(FILE* fp,int frame_index,int num_channels,int num_slices,flo
     // Grab the frame in question
     // Data are stored as int16 (or uint16?)
     int16_t * f_hold=(int16_t*)malloc(sizeof(int16_t)*num_channels*num_slices);
-    t=dicom_scan(fp,"\xe0\x7f","\x10\x00");
+    //t=dicom_scan(fp,"\xe0\x7f","\x10\x00");
+    t=dicom_scan(fp,"\xe0\x7f","\x19\x99");    
     fseek(fp,t.byte_offset_to_data,SEEK_SET);
 
     /* Data is currently stored as: */
@@ -187,6 +188,12 @@ struct dicom_tag dicom_scan(FILE* fp,const char * search_group,const char* searc
     
     char buffer[0xFFF]={0}; // Throwaway buffer that we'll use to check various things
     char transfer_syntax[64]={0}; // allocate this further down
+
+    // Get the file size so we don't actually read out of bounds.
+    size_t fp_size;
+    fseek(fp,0L,SEEK_END);
+    fp_size=ftell(fp);
+    fseek(fp,0,SEEK_SET);
     
     // 128 bytes of padding
     fseek(fp,128,SEEK_SET);
@@ -278,9 +285,15 @@ struct dicom_tag dicom_scan(FILE* fp,const char * search_group,const char* searc
     
     while ((strcmp(tag.group,search_group)!=0)||strcmp(tag.element,search_element)!=0){
 	tag=read_tag_info(fp,(const char *)transfer_syntax);
-	//printf("Offset for tag data: %lu\n",tag.byte_offset_to_data);
-	fseek(fp,tag.size,SEEK_CUR);
-	//printf("\n");
+
+	if (ftell(fp)+tag.size<=fp_size){
+	    fseek(fp,tag.size,SEEK_CUR);
+	}
+	else{
+	    printf("Reached end of raw file without finding tag %02hhx%02hhx,%02hhx%02hhx\n",search_group[1],search_group[0],search_element[1],search_element[0]);
+	    exit(1);
+	}
+	
     }
     
     return tag;    
