@@ -78,6 +78,7 @@ void ReadDICOMFrame(FILE* fp,int frame_index,int num_channels,int num_slices,flo
     // Data are stored as int16 (or uint16?)
     int16_t * f_hold=(int16_t*)malloc(sizeof(int16_t)*num_channels*num_slices);
     t=dicom_scan(fp,"\xe0\x7f","\x10\x00");
+    //t=dicom_scan(fp,"\xe0\x7f","\x19\x99");    
     fseek(fp,t.byte_offset_to_data,SEEK_SET);
 
     /* Data is currently stored as: */
