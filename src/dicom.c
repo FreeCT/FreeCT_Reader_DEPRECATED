@@ -187,6 +187,12 @@ struct dicom_tag dicom_scan(FILE* fp,const char * search_group,const char* searc
     
     char buffer[0xFFF]={0}; // Throwaway buffer that we'll use to check various things
     char transfer_syntax[64]={0}; // allocate this further down
+
+    // Get the file size so we don't actually read out of bounds.
+    size_t fp_size;
+    fseek(fp,0L,SEEK_END);
+    fp_size=ftell(fp);
+    fseek(fp,0,SEEK_SET);
     
     // 128 bytes of padding
     fseek(fp,128,SEEK_SET);
@@ -278,9 +284,15 @@ struct dicom_tag dicom_scan(FILE* fp,const char * search_group,const char* searc
     
     while ((strcmp(tag.group,search_group)!=0)||strcmp(tag.element,search_element)!=0){
 	tag=read_tag_info(fp,(const char *)transfer_syntax);
-	//printf("Offset for tag data: %lu\n",tag.byte_offset_to_data);
-	fseek(fp,tag.size,SEEK_CUR);
-	//printf("\n");
+
+	if (ftell(fp)+tag.size<=fp_size){
+	    fseek(fp,tag.size,SEEK_CUR);
+	}
+	else{
+	    printf("Reached end of raw file without finding tag %02hhx%02hhx,%02hhx%02hhx\n",search_group[1],search_group[0],search_element[1],search_element[0]);
+	    exit(1);
+	}
+	
     }
     
     return tag;    
