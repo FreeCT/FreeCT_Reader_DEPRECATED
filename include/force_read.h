@@ -19,12 +19,14 @@
 /* Questions and comments should be directed to */
 /* jmhoffman@mednet.ucla.edu with "CTBANGBANG" in the subject line*/
 
-#ifndef ptr_h
-#define ptr_h
+#ifndef force_read_h
+#define force_read_h
 
-//PTR Readers
-extern void ReadPTRFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
-extern float ReadPTRTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
-extern long ReadPTRTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
+#include "force.h"
+
+//Force Readers
+void ReadForceFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
+float ReadForceTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
+long ReadForceTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
 
 #endif

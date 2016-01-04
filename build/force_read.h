@@ -19,9 +19,14 @@
 /* Questions and comments should be directed to */
 /* jmhoffman@mednet.ucla.edu with "CTBANGBANG" in the subject line*/
 
-#ifndef binary_h
-#define binary_h
+#ifndef force_read_h
+#define force_read_h
 
-extern void ReadBinaryFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f,size_t d_offset);
+#include "force.h"
+
+//Force Readers
+void ReadForceFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
+float ReadForceTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
+long ReadForceTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
 
 #endif

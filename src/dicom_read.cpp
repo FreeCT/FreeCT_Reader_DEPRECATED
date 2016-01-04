@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <math.h>
 
-#include "../include/dicom.h"
+#include "../include/dicom_read.h"
 
 struct dicom_tag{
     char group[3];

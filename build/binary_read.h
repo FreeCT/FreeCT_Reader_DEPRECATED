@@ -19,25 +19,9 @@
 /* Questions and comments should be directed to */
 /* jmhoffman@mednet.ucla.edu with "CTBANGBANG" in the subject line*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <math.h>
+#ifndef binary_read_h
+#define binary_read_h
 
-#include "../include/siemens_ima.h"
+extern void ReadBinaryFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f,size_t d_offset);
 
-void ReadIMAFrame(FILE* fp, int frame_index, int num_channels, int num_slices, float *f,int raw_data_type,size_t offset){
-    printf("IMA (Siemens) file types are not supported in this version of FreeCT Reader. Sorry!\n");
-    exit(1); // Linux error for "operation not permitted"
-}
-
-float ReadIMATubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices,int raw_data_type,size_t offset){
-    printf("IMA (Siemens) file types are not supported in this version of FreeCT Reader. Sorry!\n");
-    exit(1); // Linux error for "operation not permitted"
-}
-
-long ReadIMATablePosition(FILE* fp, int frame_index,int num_channels,int num_slices,int raw_data_type,size_t offset){
-    printf("IMA (Siemens) file types are not supported in this version of FreeCT Reader. Sorry!\n");
-    exit(1); // Linux error for "operation not permitted"
-}
+#endif

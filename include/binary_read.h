@@ -19,12 +19,9 @@
 /* Questions and comments should be directed to */
 /* jmhoffman@mednet.ucla.edu with "CTBANGBANG" in the subject line*/
 
-#ifndef ctd_h
-#define ctd_h
+#ifndef binary_read_h
+#define binary_read_h
 
-//CTD Readers
-extern void ReadCTDFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f);
-extern float ReadCTDTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices);
-extern long ReadCTDTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices);
+extern void ReadBinaryFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f,size_t d_offset);
 
 #endif

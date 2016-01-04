@@ -25,19 +25,26 @@
 #include <unistd.h>
 #include <math.h>
 
-#include "../include/ptr.h"
+#include "../include/force_read.h"
 
-void ReadPTRFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f){
+struct force_frame read_force_frame(FILE* fp, int frame_index,int num_channels,int num_slices,int frame_flag,size_t offset);
+
+//Force Readers
+void ReadForceFrame(FILE* fp,int frame_index,int num_channels,int num_slices,float *f){
     printf("PTR file types are not supported in this version of FreeCT Reader. Sorry!\n");
     exit(1); // Linux error for "operation not permitted"
 }
 
-float ReadPTRTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices){
+float ReadForceTubeAngle(FILE* fp, int frame_index,int num_channels,int num_slices){
+    printf("PTR file types are not supported in this version of FreeCT Reader. Sorry!\n");
+    exit(1); // Linux error for "operation not permitted"
+}
+long ReadForceTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices){
     printf("PTR file types are not supported in this version of FreeCT Reader. Sorry!\n");
     exit(1); // Linux error for "operation not permitted"
 }
 
-long ReadPTRTablePosition(FILE* fp, int frame_index,int num_channels,int num_slices){
+struct force_frame read_force_frame(FILE* fp, int frame_index,int num_channels,int num_slices,int frame_flag,size_t offset){
     printf("PTR file types are not supported in this version of FreeCT Reader. Sorry!\n");
     exit(1); // Linux error for "operation not permitted"
 }
