@@ -50,3 +50,5 @@ test
 
 # Debug files
 *.dSYM/
+
+build/
