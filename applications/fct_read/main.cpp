@@ -1,7 +1,8 @@
 #include <iostream>
 
+#include <FreeCTRead.h>
+
 #include <boost/filesystem.hpp>
-#include <fct_read.h>
 
 void usage(){
   printf("freect_read -i /path/to/dicom_directory/ -o /path/to/output_directory/\n");
@@ -55,7 +56,7 @@ int main(int argc, char ** argv){
   }
 
 
-  // Ensure input and output directories exist
+  // Ensure input and output directories/paths exist
   if (!boost::filesystem::exists(input_dirpath)){
     std::cout << "Could not find input dirpath: " << input_dirpath << std::endl;
     exit(1);
@@ -68,19 +69,16 @@ int main(int argc, char ** argv){
    
   std::cout << "Got input_path: " << input_dirpath << std::endl;
   std::cout << "Got output_path: " << output_dirpath << std::endl;
-
-
-  // Get a full file list for the input directory
-  std::vector<std::string> file_list;
-  for(auto & p : boost::filesystem::directory_iterator(boost::filesystem::path(input_dirpath))){
-    file_list.push_back(boost::filesystem::path(p).string());    
-  }
-  std::sort(file_list.begin(),file_list.end());
   
+  // Runtime polymorphism to eventually support multiple raw data formats
+  fct::RawDataSet * ds;
+  fct::DicomDataSet dicom_ds;
+  ds = &dicom_ds;
 
+  ds->setPath(input_dirpath);
+  ds->readAll();
 
-  
-  
-    
+  ds-> debugPrintInfo();
+
   return 0;
 }
