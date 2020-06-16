@@ -16,7 +16,6 @@ void error_out(std::string message){
 }
 
 int main(int argc, char ** argv){
-
   
   std::string input_dirpath = "";
   std::string output_dirpath = "";
@@ -37,8 +36,7 @@ int main(int argc, char ** argv){
       
     else if (arg=="-o")
       output_dirpath = argv[++i];
-
-    // TODO: add support for output format
+    
     else{
       std::string message = "Unrecognized option \"" + std::string(argv[i]) +  "\" requested";
       error_out(message);
@@ -55,7 +53,6 @@ int main(int argc, char ** argv){
     error_out(message);
   }
 
-
   // Ensure input and output directories/paths exist
   if (!boost::filesystem::exists(input_dirpath)){
     std::cout << "Could not find input dirpath: " << input_dirpath << std::endl;
@@ -67,8 +64,8 @@ int main(int argc, char ** argv){
     exit(1);
   }
    
-  std::cout << "Got input_path: " << input_dirpath << std::endl;
-  std::cout << "Got output_path: " << output_dirpath << std::endl;
+  std::cout << "Input file/directory: " << input_dirpath << std::endl;
+  std::cout << "Output directory:     " << output_dirpath << std::endl;
   
   // Runtime polymorphism to eventually support multiple raw data formats
   fct::RawDataSet * ds;
@@ -78,7 +75,7 @@ int main(int argc, char ** argv){
   ds->setPath(input_dirpath);
   ds->readAll();
 
-  ds-> debugPrintInfo();
+  ds->writeAll(output_dirpath);
 
   return 0;
 }

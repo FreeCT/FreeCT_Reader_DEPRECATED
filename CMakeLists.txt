@@ -36,6 +36,18 @@ ELSE(DCMTK_FOUND)
   MESSAGE(FATAL_ERROR "Cannot find DCMTK, are you sure you've installed it?")
 ENDIF(DCMTK_FOUND)
 
+find_package(yaml-cpp REQUIRED)
+if (yaml-cpp_FOUND)
+  message("Found yaml-cpp.  Assuming it's installed on library search path.")
+ELSE(yaml-cpp_FOUND)
+endif(yaml-cpp_FOUND)
+
+#get_cmake_property(_variableNames VARIABLES)
+#list (SORT _variableNames)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
+
 #DCMTK_INCLUDE_DIRS  - Directories to include to use DCMTK
 #DCMTK_LIBRARIES     - Files to link against to use DCMTK
 #DCMTK_FOUND         - If false, don't try to use DCMTK
