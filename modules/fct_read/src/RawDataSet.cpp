@@ -1,6 +1,5 @@
 #include <RawDataSet.h>
 
-#include <blosc.h>
 #include <yaml-cpp/yaml.h>
 
 #include <cstring>
@@ -9,6 +8,8 @@
 #include <boost/filesystem.hpp>
 
 namespace fct{
+
+  /*  METHODS FOR RawDataSet */
   void RawDataSet::setPath(std::string path){
     m_path = path;
   }
@@ -42,7 +43,8 @@ namespace fct{
     ye << YAML::Comment("SCANNER GEOMETRY");
     ye << YAML::Key << "distance_source_to_detector" << YAML::Value << m_dist_source_to_detector;
     ye << YAML::Key << "distance_source_to_isocenter" << YAML::Value << m_dist_source_to_isocenter;
-    ye << YAML::Key << "detector_central_element" << YAML::Flow << m_detector_central_element;
+    ye << YAML::Key << "detector_central_row" << m_detector_central_row;
+    ye << YAML::Key << "detector_central_channel" << m_detector_central_channel;
     ye << YAML::Key << "projection_geometry" << YAML::Value << m_projection_geometry;
     
     ye << YAML::Newline << YAML::Newline;
@@ -50,11 +52,14 @@ namespace fct{
     ye << YAML::Key << "scan_type" <<  YAML::Value << m_scan_type;
     ye << YAML::Key << "projections_per_rotation" <<  YAML::Value << m_projections_per_rotation;
     ye << YAML::Key << "flying_focal_spot_mode" <<  YAML::Value << m_flying_focal_spot_mode;
-   
+    
+    ye << YAML::Key << "total_num_projections" <<  YAML::Value << m_total_num_projections;
     ye << YAML::EndMap;
 
     std::ofstream ofs_meta(dirpath + "/" + "meta.yaml");
     ofs_meta << ye.c_str() << std::endl;
+
+    std::cout << ye.c_str() << std::endl;
     
     std::ofstream ofs_source_positions(dirpath + "/" + "source_positions.dat");
     for (auto &f: m_data){
@@ -62,11 +67,23 @@ namespace fct{
       ofs_source_positions << f->getDFCAxialPosition() + f->getFFSAxialShift() << ",";
       ofs_source_positions << f->getDFCRadialPosition() + f->getFFSRadialShift() << std::endl;
     }
-
+    
     // Write the raw projection data to a binary file
     std::ofstream out(dirpath + "/" + "projections.dat", std::ios::out | std::ios::binary | std::ios::trunc);
     for (auto &f: m_data)
       out.write((char*)f->m_projection.data(),m_detector_rows*m_detector_channels*sizeof(float));
     
   }
+
+
+  /* METHODS FOR RawDataFrame */
+  int RawDataFrame::getRows(){
+    return m_detector_rows;
+  };
+  
+  int RawDataFrame::getCols(){
+    return m_detector_channels;
+  };
+
+  
 }
