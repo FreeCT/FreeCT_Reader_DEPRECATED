@@ -14,20 +14,7 @@ namespace fct{
     m_path = path;
   }
 
-  void RawDataSet::debugPrintInfo(){
-    std::cout << "Base class path: "<<  m_path << std::endl;
-    std::cout << "Base data vector size: "<<  m_data.size() << std::endl;
-
-    std::cout << "Derived class filepaths: " << std::endl;
-    for (auto &p: m_data){
-      std::cout << p->getFilepath() << std::endl;
-    }
-  }
-
-  void RawDataSet::writeAll(std::string dirpath){
-
-    // Emit YAML metadata and save to disk
-    YAML::Emitter ye;
+  void RawDataSet::getYAMLEmitter(YAML::Emitter& ye){
     ye << YAML::BeginMap;
 
     ye << YAML::Comment("FREECT READER OUTPUT FOR: " + m_path) << YAML::Newline << YAML::Newline;
@@ -54,25 +41,37 @@ namespace fct{
     ye << YAML::Key << "flying_focal_spot_mode" <<  YAML::Value << m_flying_focal_spot_mode;
     
     ye << YAML::Key << "total_num_projections" <<  YAML::Value << m_total_num_projections;
-    ye << YAML::EndMap;
+    ye << YAML::EndMap;    
+  };
+
+  void RawDataSet::writeAll(std::string dirpath){
+    // Emit YAML metadata and save to disk
+    YAML::Emitter ye;
+    getYAMLEmitter(ye);
 
     std::ofstream ofs_meta(dirpath + "/" + "meta.yaml");
     ofs_meta << ye.c_str() << std::endl;
 
     std::cout << ye.c_str() << std::endl;
-    
-    std::ofstream ofs_source_positions(dirpath + "/" + "source_positions.dat");
-    for (auto &f: m_data){
-      ofs_source_positions << f->getDFCAngularPosition() + f->getFFSAngularShift() << ",";
-      ofs_source_positions << f->getDFCAxialPosition() + f->getFFSAxialShift() << ",";
-      ofs_source_positions << f->getDFCRadialPosition() + f->getFFSRadialShift() << std::endl;
-    }
-    
-    // Write the raw projection data to a binary file
+
+    // Save source positions and projection data
     std::ofstream out(dirpath + "/" + "projections.dat", std::ios::out | std::ios::binary | std::ios::trunc);
-    for (auto &f: m_data)
-      out.write((char*)f->m_projection.data(),m_detector_rows*m_detector_channels*sizeof(float));
     
+    for (auto &f: m_data){
+      float  angle = f->getDFCAngularPosition() + f->getFFSAngularShift();
+      float  axial = f->getDFCAxialPosition() + f->getFFSAxialShift();
+      float radial = f->getDFCRadialPosition() + f->getFFSRadialShift();
+      out.write((char*)&angle ,sizeof(float));
+      out.write((char*)&axial ,sizeof(float));
+      out.write((char*)&radial,sizeof(float));
+      out.write((char*)f->m_projection.data(),m_detector_rows*m_detector_channels*sizeof(float));
+    }
+  }
+
+  void RawDataSet::printMetadata(){
+    YAML::Emitter ye;
+    getYAMLEmitter(ye);
+    std::cout << ye.c_str() << std::endl;
   }
 
 

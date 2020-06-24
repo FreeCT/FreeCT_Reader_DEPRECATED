@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 #include <FreeCTRead.h>
 
@@ -68,9 +69,11 @@ int main(int argc, char ** argv){
   std::cout << "Output directory:     " << output_dirpath << std::endl;
   
   // Runtime polymorphism to eventually support multiple raw data formats
-  fct::RawDataSet * ds;
-  fct::DicomDataSet dicom_ds;
-  ds = &dicom_ds;
+  std::unique_ptr<fct::RawDataSet> ds = std::make_unique<fct::DicomDataSet>();
+
+  //fct::RawDataSet * ds;
+  //fct::DicomDataSet dicom_ds;
+  //ds = &dicom_ds;
 
   ds->setPath(input_dirpath);
   ds->readAll();

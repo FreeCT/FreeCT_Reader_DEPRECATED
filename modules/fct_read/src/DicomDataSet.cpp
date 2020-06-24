@@ -8,7 +8,7 @@
 
 namespace fct{
   
-  bool DicomFrame::readFromFile(std::string filepath){
+  bool DicomFrame::readFromFile(std::string filepath,size_t frame_idx){
 
     auto error_with_message = [](std::string message){
                                 std::cout << " ERROR: " << message << std::endl;

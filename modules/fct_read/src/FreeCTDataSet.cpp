@@ -5,8 +5,19 @@
 
 namespace fct{
 
-  bool FreeCTFrame::readFromFile(std::string filepath){
-    std::cout << "Fart knockers" << std::endl;
+  bool FreeCTFrame::readFromFile(std::string filepath, size_t frame_idx){
+    std::ifstream ifs(filepath,std::ios::binary);
+
+    size_t offset = (3 + m_detector_rows*m_detector_channels)*sizeof(float)*frame_idx;
+
+    ifs.seekg(offset,ifs.beg);
+    ifs.read((char*)&m_dfc_angular_position,sizeof(float));
+    ifs.read((char*)&m_dfc_axial_position,sizeof(float));
+    ifs.read((char*)&m_dfc_radial_distance,sizeof(float));
+    
+    m_projection.resize(m_detector_rows,m_detector_channels);
+    ifs.read((char*)m_projection.data(),m_detector_rows*m_detector_channels*sizeof(float));
+    
     return true;
   }
 
@@ -30,25 +41,25 @@ namespace fct{
       exit(1);
     }
 
-    // Read and parse the meta.yaml file
-    std::ifstream fin(meta_filepath);
-    YAML::Parser parser(fin);
-    
-    YAML::Node doc;
+    // Read and parse the meta.yaml file    
+    YAML::Node doc = YAML::LoadFile(meta_filepath);
+    doc >> *this;
 
-    //for(YAML::Iterator it=doc.begin();it!=doc.end();++it) {
-    //  std::string key, value;
-    //  it.first() >> key;
-    //  it.second() >> value;
-    //  std::cout << "Key: " << key << ", value: " << value << std::endl;
-    //}
+    //m_data.resize(m_total_num_projections);
     
-    //while(parser.GetNextDocument(doc)) {
-    //  // ...
-    //}
+    // Read and parse the source positions and frame data
+    for (size_t i=0;i<m_total_num_projections;i++){
 
-    //YAML::Node metadata = YAML::LoadFile(meta_filepath);
-    //parse_item();
- 
+      std::unique_ptr<fct::RawDataFrame> rdf = std::make_unique<fct::FreeCTFrame>();
+
+      rdf->setDetectorRows(m_detector_rows);
+      rdf->setDetectorChannels(m_detector_channels);
+      rdf->readFromFile(m_path);
+
+      m_data.push_back(std::move(rdf));
+      
+    }
+    
+
   }
 }

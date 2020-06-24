@@ -8,7 +8,7 @@ namespace fct{
 
   class DicomFrame: public RawDataFrame{
   public:
-    virtual bool readFromFile(std::string filepath);
+    virtual bool readFromFile(std::string filepath, size_t frame_idx);
   };
   
   class DicomDataSet: public RawDataSet{
