@@ -1,5 +1,7 @@
 # FreeCT_Reader
 
+**NOTE:  No further updates or changes will be made to this repository.  I am currently in the process of migrating the entirety of the FreeCT project into one project: https://github.com/FreeCT/FreeCT.   This should simplify building and installing in every single way, however in the mean time there are going to be some growing pains and the project will be non-functional.  If you have any questions or comments please reach out to johnmarianhoffman@gmail.com.**
+
 FreeCT_Reader is the reader library used by the FreeCT software package.  It is capable of reading binary data files and DICOM formatted raw data files.  It is also available for external use in other software packages undert the GNU LGPL v2.1.
 
 We are particularly interested in targeting the "Low Dose CT Image and Projection Data" data set provided by the Mayo Clinic, which can be found at https://wiki.cancerimagingarchive.net/pages/viewpage.action?pageId=52758026.  Developement is ongoing and issues and features reported or requested via the GitHub issues page (https://github.com/FreeCT/FreeCT_Reader/issues) will be addressed as quickly as possible.
